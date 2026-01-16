@@ -1,15 +1,19 @@
 import pygame
 from settings import *
+from map import Map
 
 class Game:
   def __init__(self):
     pygame.init()
 
-    self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
     self.clock = pygame.time.Clock()
 
     self.running = True
+
+    self.map = Map(0.3)
+    print(self.map.waypoints)
 
   def get_events(self):
     for e in pygame.event.get():
@@ -17,6 +21,10 @@ class Game:
         self.running = False
 
   def draw(self):
+    self.screen.fill((0, 0, 0))
+
+    self.map.draw(self.screen)
+
     pygame.display.flip()
 
   def run(self):
@@ -25,7 +33,7 @@ class Game:
 
       self.draw()
 
-      self.clock.tick(60)
+      self.clock.tick(FPS)
 
     pygame.quit()
 
