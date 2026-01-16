@@ -1,6 +1,6 @@
 import pygame
 from settings import *
-
+# testowy
 class TDBalloons:
   def __init__(self):
     pygame.init()
