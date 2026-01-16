@@ -1,12 +1,11 @@
 import pygame
 from settings import *
 
-class TDBalloons:
+class Game:
   def __init__(self):
     pygame.init()
 
     self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("TDBalloons")
 
     self.clock = pygame.time.Clock()
 
@@ -31,5 +30,5 @@ class TDBalloons:
     pygame.quit()
 
 if __name__ == "__main__":
-  game = TDBalloons()
+  game = Game()
   game.run()

@@ -1,2 +1,0 @@
-class Balloon:
-  pass

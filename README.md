@@ -1,31 +1,38 @@
-plans:
+## Balloons
 
-- balloons:
+- [ ] Base stats: `HP`, `speed`, `damage`, `reward`
+- [ ] Split logic upon death
+- [ ] Factory method implementation
 
-  - hp, speed, damage (to player upon escaping), reward $
-  - split into worse balloon
-  - factory method
+## Towers
 
-- towers:
+- [ ] Base stats: `damage`, `range`, `cooldown`, `cost`
+- [ ] Define the `attack()` method for override
+- [ ] Stat upgrades system
+- [ ] Create basic towers with different abilities
 
-  - damage, range, projectile speed, cost $
-  - subclasses projectiles
+## Maps
 
-- maps:
+- [ ] Generate map with paths as a tilemap (using AI or algorithm)
 
-  - generate map with paths instead of static images and paths (tilemap, ai or automation)
+## Difficulties
 
-- difficulties:
+- [ ] **Modifiers:**
+  - Shorter path length
+  - Faster balloons
+  - Higher balloon `HP`
+  - Lower spawn delay
+  - More balloons per wave
 
-  - shorter paths
-  - faster balloons
-  - more hp
-  - lower delay between balloon spawning
-  - more balloons per wave (music calm in interim then KR during waves)
+## UI
 
-- menu:
-  - new game (difficulties)
-  - continue (save file: current round, money, towers (placement), map)
-  - stats (per game, overall)
-
-music: KR
+- [ ] **Main Menu:**
+  - New Game: difficulty selection
+  - Continue: load save file
+  - Stats: per game / overall
+- [ ] **Save System:**
+  - Data: `current round`, `money`, `towers`, `map`
+- [ ] **Audio:**
+  - Menu: ?
+  - Between waves: Calm
+  - During waves: KR
