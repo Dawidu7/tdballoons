@@ -1,22 +1,40 @@
 from .base import Balloon
 
 BALLOON_DATA = {
-    "red":     {"hp": 1,  "speed": 2,   "damage": 1,  "reward": 2,   "color": (255, 0, 0)},
-    "blue":    {"hp": 2,  "speed": 3,   "damage": 1,  "reward": 5,   "color": (0, 0, 255)},
-    "green":   {"hp": 3,  "speed": 4,   "damage": 1,  "reward": 8,   "color": (0, 255, 0)},
-    "yellow":  {"hp": 4,  "speed": 5,   "damage": 2,  "reward": 12,  "color": (255, 255, 0)},
-    "pink":    {"hp": 1,  "speed": 7,   "damage": 1,  "reward": 15,  "color": (255, 192, 203)},
-    "black":   {"hp": 10, "speed": 1.5, "damage": 5,  "reward": 25,  "color": (30, 30, 30)},
-    "lead":    {"hp": 25, "speed": 1,   "damage": 10, "reward": 50,  "color": (120, 120, 120)},
-    "rainbow": {"hp": 50, "speed": 2,   "damage": 20, "reward": 100, "color": (255, 0, 255)},
+    "purple": {"hp": 10, "speed": 1.5, "damage": 5, "reward": 20},
+    "pink":   {"hp": 5,  "speed": 3.5, "damage": 2, "reward": 15},
+    "cyan":   {"hp": 4,  "speed": 3.0, "damage": 1, "reward": 12},
+    "yellow": {"hp": 3,  "speed": 2.5, "damage": 1, "reward": 10},
+    "orange": {"hp": 2,  "speed": 2.0, "damage": 1, "reward": 5},
+    "green":  {"hp": 2,  "speed": 1.8, "damage": 1, "reward": 4},
+    "red":    {"hp": 1,  "speed": 1.5, "damage": 1, "reward": 2}
 }
 
+CHILD_MAP = {
+    "purple": "pink",
+    "pink":   "cyan",
+    "cyan":   "yellow",
+    "yellow": "orange",
+    "orange": "green",
+    "green":  "red",
+    "red":    None
+}
+
+class ConcreteBalloon(Balloon):
+    def __init__(self, name, waypoints):
+        data = BALLOON_DATA[name]
+        super().__init__(
+            color_name=name,
+            hp=data["hp"],
+            speed=data["speed"],
+            damage=data["damage"],
+            reward=data["reward"],
+            waypoints=waypoints
+        )
+        self.child_type = CHILD_MAP.get(name)
+
 def balloon_factory(name, waypoints):
-    stats = BALLOON_DATA.get(name.lower(), BALLOON_DATA["red"]).copy()
-    
-    color = stats.pop("color")
-    
-    balloon = Balloon(waypoints=waypoints, **stats)
-    balloon.image.fill(color)
-    
-    return balloon
+    name = name.lower()
+    if name not in BALLOON_DATA:
+        name = "red"
+    return ConcreteBalloon(name, waypoints)

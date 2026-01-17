@@ -1,20 +1,28 @@
 import pygame
 
 class Balloon(pygame.sprite.Sprite):
-    def __init__(self, hp, speed, damage, reward, waypoints):
+    def __init__(self, color_name, hp, speed, damage, reward, waypoints):
         super().__init__()
-
+        
         self.hp = hp
-        self.speed = speed * 100
+        self.speed = speed * 100 
         self.reward = reward
         self.damage = damage
         self.waypoints = waypoints
         self.current_waypoint_index = 0
+        self.child_type = None 
+
+        formatted_color = color_name.capitalize()
+        image_path = f"assets/images/balloons/Balloon{formatted_color}.png"
         
-        # self.image = pygame.image.load("*.png").convert_alpha()
-        self.image = pygame.Surface((20, 20))
+        try:
+            raw_image = pygame.image.load(image_path).convert_alpha()
+            self.image = pygame.transform.scale(raw_image, (40, 50))
+        except pygame.error:
+            self.image = pygame.Surface((30, 30))
+            self.image.fill((255, 0, 255))
+            
         self.rect = self.image.get_rect()
-        
         self.pos = pygame.Vector2(self.waypoints[0])
         self.rect.center = self.pos
 
