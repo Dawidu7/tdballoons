@@ -28,6 +28,13 @@ class Map:
         y = row * TILE_SIZE
         pygame.draw.rect(surface, color, (x, y, TILE_SIZE, TILE_SIZE))
 
+  def can_place_tower(self, x, y):
+    col = x // TILE_SIZE
+    row = y // TILE_SIZE
+    if not (0 <= row < GRID_SIZE and 0 <= col < GRID_SIZE):
+      return False
+    return self.grid[row][col] == TILE_GRASS
+
   def _generate_path(self):
     self.grid = [[TILE_GRASS for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
     self.waypoints = []
