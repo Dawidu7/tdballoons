@@ -18,7 +18,7 @@ class Game:
     self.money = 100
     self.health = 100
 
-    # self.enemies.add(balloon_factory("yellow", self.map.waypoints))
+    self.enemies.add(balloon_factory("red", self.map.waypoints))
 
   def run(self):
     while self.running:
@@ -26,7 +26,6 @@ class Game:
       self._get_events()
       self._update(dt)
       self._draw()
-      print(self.money)
 
   def _get_events(self):
     for e in pygame.event.get():
@@ -40,9 +39,14 @@ class Game:
   def _update(self, dt):
     self.enemies.update(dt)
     for enemy in self.enemies:
+      if not enemy.is_alive:
+        self.money += enemy.reward
+        enemy.kill()
       if enemy.has_escaped:
         self.health -= enemy.damage
         enemy.kill()
+
+    self.towers.update(dt, self)
 
   def _draw(self):
     self.screen.fill((0, 0, 0))

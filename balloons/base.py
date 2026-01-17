@@ -1,4 +1,5 @@
 import pygame
+import os
 
 class Balloon(pygame.sprite.Sprite):
     def __init__(self, color_name, hp, speed, damage, reward, waypoints):
@@ -13,8 +14,9 @@ class Balloon(pygame.sprite.Sprite):
         self.child_type = None 
 
         formatted_color = color_name.capitalize()
-        image_path = f"assets/images/balloons/Balloon{formatted_color}.png"
-        
+        image_path = os.path.join(os.path.dirname(__file__), "..", "assets", "images", "balloons", f"Balloon{formatted_color}.png")
+        image_path = os.path.normpath(image_path)
+
         try:
             raw_image = pygame.image.load(image_path).convert_alpha()
             self.image = pygame.transform.scale(raw_image, (40, 50))
@@ -60,3 +62,6 @@ class Balloon(pygame.sprite.Sprite):
             self.pos += direction.normalize() * step
 
         self.rect.center = self.pos
+
+    def take_damage(self, damage):
+        self.hp -= damage
