@@ -1,19 +1,28 @@
 import pygame
 from settings import *
 from map import Map
+from balloons import balloon_factory
 
 class Game:
   def __init__(self):
     pygame.init()
 
     self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
     self.clock = pygame.time.Clock()
-
     self.running = True
 
     self.map = Map(0.3)
-    print(self.map.waypoints)
+    self.enemies = pygame.sprite.Group()
+    self.money = 0
+
+    self.enemies.add(balloon_factory("red", self.map.waypoints))
+
+  def run(self):
+    while self.running:
+      dt = self.clock.tick(FPS) / 1000.0
+      self.get_events()
+      self.update(dt)
+      self.draw()
 
   def get_events(self):
     for e in pygame.event.get():
@@ -24,32 +33,14 @@ class Game:
     self.screen.fill((0, 0, 0))
 
     self.map.draw(self.screen)
+    self.enemies.draw(self.screen)
 
     pygame.display.flip()
-
-  def run(self):
-    while self.running:
-      self.get_events()
-
-      self.draw()
-
-      self.clock.tick(60)
       
-  def update(self):
-      for enemy in self.enemies:
-          if enemy.hp <= 0:
-              if enemy.child_type:
-                  new_enemy = balloon_factory(enemy.child_type, enemy.path, self.current_difficulty)
-                  new_enemy.current_point_index = enemy.current_point_index
-                  new_enemy.rect.center = enemy.rect.center
-                  self.enemies.add(new_enemy)
-              
-              self.money += enemy.reward
-              enemy.kill()
-      self.clock.tick(FPS)
-
-    pygame.quit()
+  def update(self, dt):
+    self.enemies.update(dt)
 
 if __name__ == "__main__":
   game = Game()
   game.run()
+  pygame.quit()
