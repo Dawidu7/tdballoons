@@ -68,10 +68,23 @@ class Map:
         case "RIGHT":
           v += 1
           last_v = 1
+
+      if u == GRID_SIZE - 1:
+        break
       
       self._place_tile(u, v, start_side, TILE_PATH)
 
     self._place_tile(u, v, start_side, TILE_END)
+
+    start = pygame.Vector2(self.waypoints[0])
+    next = pygame.Vector2(self.waypoints[1])
+    start_dir = (start - next).normalize()
+    self.waypoints.insert(0, tuple(start + start_dir * TILE_START))
+
+    end = pygame.Vector2(self.waypoints[-1])
+    prev = pygame.Vector2(self.waypoints[-2])
+    end_dir = (end - prev).normalize()
+    self.waypoints.append(tuple(end + end_dir * TILE_SIZE))
 
   def _place_tile(self, u, v, start_side, tile):
     row, col = 0, 0

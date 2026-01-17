@@ -14,8 +14,11 @@ class Game:
     self.map = Map(0.3)
     self.enemies = pygame.sprite.Group()
     self.money = 0
+    self.health = 100
 
-    self.enemies.add(balloon_factory("red", self.map.waypoints))
+    self.enemies.add(balloon_factory("yellow", self.map.waypoints))
+    self.enemies.add(balloon_factory("yellow", self.map.waypoints))
+    self.enemies.add(balloon_factory("yellow", self.map.waypoints))
 
   def run(self):
     while self.running:
@@ -23,6 +26,8 @@ class Game:
       self.get_events()
       self.update(dt)
       self.draw()
+
+      print(self.enemies, self.health)
 
   def get_events(self):
     for e in pygame.event.get():
@@ -39,6 +44,10 @@ class Game:
       
   def update(self, dt):
     self.enemies.update(dt)
+    for enemy in self.enemies:
+      if enemy.has_escaped:
+        self.health -= enemy.damage
+        enemy.kill()
 
 if __name__ == "__main__":
   game = Game()

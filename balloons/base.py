@@ -22,6 +22,10 @@ class Balloon(pygame.sprite.Sprite):
     def is_alive(self):
         return self.hp > 0
     
+    @property
+    def has_escaped(self):
+        return self.current_waypoint_index >= len(self.waypoints) - 1
+    
     def update(self, dt):
         self.move(dt)
 
