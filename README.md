@@ -1,8 +1,9 @@
 ## Balloons
 
-- [ ] Base stats: `HP`, `speed`, `damage`, `reward`
+- [x] Base stats: `HP`, `speed`, `damage`, `reward`
+- [x] Movement logic
 - [ ] Split logic upon death
-- [ ] Factory method implementation
+- [x] Factory method implementation
 
 ## Towers
 
@@ -13,7 +14,7 @@
 
 ## Maps
 
-- [ ] Generate map with paths as a tilemap (using AI or algorithm)
+- [x] Generate map with paths as a tilemap (using AI or algorithm)
 
 ## Difficulties
 
@@ -23,6 +24,7 @@
   - Higher balloon `HP`
   - Lower spawn delay
   - More balloons per wave
+  - Less money earned
 
 ## UI
 
