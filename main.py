@@ -33,6 +33,19 @@ class Game:
 
       self.draw()
 
+      self.clock.tick(60)
+      
+  def update(self):
+      for enemy in self.enemies:
+          if enemy.hp <= 0:
+              if enemy.child_type:
+                  new_enemy = balloon_factory(enemy.child_type, enemy.path, self.current_difficulty)
+                  new_enemy.current_point_index = enemy.current_point_index
+                  new_enemy.rect.center = enemy.rect.center
+                  self.enemies.add(new_enemy)
+              
+              self.money += enemy.reward
+              enemy.kill()
       self.clock.tick(FPS)
 
     pygame.quit()
