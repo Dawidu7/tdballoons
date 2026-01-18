@@ -17,7 +17,7 @@ class Game:
     self.money = 100
     self.health = 100
     self.sidebar = Sidebar()
-    self.sidebar.set_buttons([("basic", 10)])
+    self.sidebar.set_buttons([("basic", 10), ("sniper", 15)])
     self.selected_tower = None
 
     self.enemies.add(balloon_factory("yellow", self.map.waypoints, self.difficulty))

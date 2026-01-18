@@ -9,18 +9,37 @@ class TargetingStrategy(ABC):
   def select(self, tower, state):
     pass
 
-class ClosestEnemy(TargetingStrategy):
-  def __init__(self, range_val):
-    super().__init__(range_val)
+  def _get_enemies_in_range(self, tower, state):
+    in_range = []
+    range_sq = self.range ** 2
 
-  def select(self, tower, state):
-    closest_dist = float("inf")
-    closest = None
     for enemy in state.enemies:
       dx = enemy.rect.centerx - tower.rect.centerx
       dy = enemy.rect.centery - tower.rect.centery
-      dist = math.hypot(dx, dy)
-      if dist <= self.range and dist < closest_dist:
-        closest_dist, closest = dist, enemy
+      dist_sq = dx**2 + dy**2
 
-    return [closest] if closest else []
+      if dist_sq <= range_sq:
+        in_range.append(enemy)
+    
+    return in_range
+
+class ClosestEnemy(TargetingStrategy):
+  def select(self, tower, state):
+    candidates = self._get_enemies_in_range(tower, state)
+    if not candidates:
+      return []
+    
+    closest = min(candidates, key=lambda e: math.hypot(
+      e.rect.centerx - tower.rect.centerx,
+      e.rect.centery - tower.rect.centery
+    ))
+    return [closest]
+  
+class HighestHPEnemy(TargetingStrategy):
+  def select(self, tower, state):
+    candidates = self._get_enemies_in_range(tower, state)
+    if not candidates:
+      return []
+    
+    strongest = max(candidates, key=lambda e: e.hp)
+    return [strongest]
