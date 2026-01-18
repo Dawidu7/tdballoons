@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from ..projectiles import Projectile
 
 class EffectStrategy(ABC):
   def __init__(self, damage, cooldown):
@@ -10,10 +9,14 @@ class EffectStrategy(ABC):
   def apply(self, tower, targets, state):
     pass
 
-class BulletEffect(EffectStrategy):
+class ProjectileEffect(EffectStrategy):
+  def __init__(self, damage, cooldown, projectile):
+    super().__init__(damage, cooldown)
+    self.projectile = projectile
+
   def apply(self, tower, enemies, state):
     for enemy in enemies:
-      bullet = Projectile(
+      bullet = self.projectile(
         start_pos=tower.rect.center,
         target=enemy,
         damage=self.damage,
