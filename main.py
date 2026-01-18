@@ -81,9 +81,8 @@ class Game:
         for enemy in self.enemies:
             if not enemy.is_alive:
                 if hasattr(enemy, 'child_type') and enemy.child_type:
-                    new_enemy = balloon_factory(enemy.child_type, self.map.waypoints, self.difficulty)
-                    new_enemy.current_waypoint_index = enemy.current_waypoint_index
-                    new_enemy.pos = pygame.Vector2(enemy.pos)
+                    new_enemy = balloon_factory(enemy.child_type, self.map.waypoints, self.difficulty, 
+                                                enemy.current_waypoint_index, pygame.Vector2(enemy.pos))
                     self.enemies.add(new_enemy)
                 
                 self.money += enemy.reward
@@ -130,7 +129,7 @@ class MainManager:
 
     def run(self):
         while self.running:
-            dt = self.clock.tick(60) / 1000.0
+            dt = self.clock.tick(FPS) / 1000.0
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

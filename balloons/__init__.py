@@ -21,7 +21,7 @@ CHILD_MAP = {
 }
 
 class ConcreteBalloon(Balloon):
-    def __init__(self, name, waypoints, hp_m, speed_m, reward_m):
+    def __init__(self, name, waypoints, hp_m, speed_m, reward_m, current_waypoint, current_pos):
         data = BALLOON_DATA[name]
         
         final_hp = max(1, int(data["hp"] * hp_m))
@@ -34,11 +34,13 @@ class ConcreteBalloon(Balloon):
             speed=final_speed,
             damage=data["damage"],
             reward=final_reward,
-            waypoints=waypoints
+            waypoints=waypoints,
+            current_waypoint=current_waypoint,
+            current_pos=current_pos
         )
         self.child_type = CHILD_MAP.get(name)
 
-def balloon_factory(name, waypoints, difficulty="Normal"):
+def balloon_factory(name, waypoints, difficulty="Normal", current_waypoint=0, current_pos=None):
     name = name.lower()
     if name not in BALLOON_DATA:
         name = "red"
@@ -53,4 +55,4 @@ def balloon_factory(name, waypoints, difficulty="Normal"):
     
     hp_m, speed_m, reward_m = diff_settings.get(diff_key, (1.0, 1.0, 1.0))
     
-    return ConcreteBalloon(name, waypoints, hp_m, speed_m, reward_m)
+    return ConcreteBalloon(name, waypoints, hp_m, speed_m, reward_m, current_waypoint, current_pos)

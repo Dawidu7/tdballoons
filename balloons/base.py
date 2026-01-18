@@ -2,7 +2,7 @@ import pygame
 import os
 
 class Balloon(pygame.sprite.Sprite):
-    def __init__(self, color_name, hp, speed, damage, reward, waypoints):
+    def __init__(self, color_name, hp, speed, damage, reward, waypoints, current_waypoint, current_pos=None):
         super().__init__()
         
         self.hp = hp
@@ -10,7 +10,7 @@ class Balloon(pygame.sprite.Sprite):
         self.reward = reward
         self.damage = damage
         self.waypoints = waypoints
-        self.current_waypoint_index = 0
+        self.current_waypoint_index = current_waypoint
         self.child_type = None 
 
         formatted_color = color_name.capitalize()
@@ -25,7 +25,7 @@ class Balloon(pygame.sprite.Sprite):
             self.image.fill((255, 0, 255))
             
         self.rect = self.image.get_rect()
-        self.pos = pygame.Vector2(self.waypoints[0])
+        self.pos = current_pos if current_pos else pygame.Vector2(self.waypoints[0])
         self.rect.center = self.pos
 
     @property
