@@ -13,6 +13,11 @@ class Tower(pygame.sprite.Sprite):
 
     self.cooldown_timer = 0
 
+  def draw_range(self, surface, color=(0, 200, 255)):
+    attack_range = getattr(self.targeting, "range", 0)
+    if attack_range > 0:
+      pygame.draw.circle(surface, color, self.rect.center, attack_range, 1)
+
   def update(self, dt, state):
     if self.cooldown_timer > 0:
       self.cooldown_timer -= dt
