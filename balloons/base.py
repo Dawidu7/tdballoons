@@ -39,9 +39,6 @@ class Balloon(pygame.sprite.Sprite):
     def update(self, dt):
         self.move(dt)
 
-    def draw(self, surface):
-        surface.blit(self.image, self.rect)
-
     def move(self, dt):
         if self.current_waypoint_index >= len(self.waypoints) - 1:
             return

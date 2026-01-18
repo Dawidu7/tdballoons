@@ -14,14 +14,11 @@ class Tower(pygame.sprite.Sprite):
     self.cooldown_timer = 0
 
   def update(self, dt, state):
-    self.cooldown_timer -= dt
     if self.cooldown_timer > 0:
+      self.cooldown_timer -= dt
       return
-    
+     
     targets = self.targeting.select(self, state)
     if targets:
-      self.effect.apply(targets, state)
+      self.effect.apply(self, targets, state)
       self.cooldown_timer = self.effect.cooldown
-
-  def draw(self, surface):
-    surface.blit(self.image, self.rect)
