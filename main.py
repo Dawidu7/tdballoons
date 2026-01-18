@@ -66,6 +66,7 @@ class Game:
     self.map = Map(0.3)
     self.enemies = pygame.sprite.Group()
     self.towers = pygame.sprite.Group()
+    self.projectiles = pygame.sprite.Group()
     self.money = 100
     self.health = 100
 
@@ -93,13 +94,14 @@ class Game:
                 enemy.kill()
 
         self.towers.update(dt, self)
+        self.projectiles.update(dt)
 
   def _draw(self):
     self.screen.fill((0, 0, 0))
     self.map.draw(self.screen)
     self.enemies.draw(self.screen)
     self.towers.draw(self.screen)
-
+    self.projectiles.draw(self.screen)
 
   def _try_place_tower(self, pos):
     if not self.map.can_place_tower(*pos):
