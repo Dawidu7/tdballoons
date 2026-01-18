@@ -21,6 +21,12 @@ TOWER_DATA = {
     "targeting": ClosestEnemy(100),
     "effect": ProjectileEffect(5, 1.5, AoEProjectile, radius=50),
     "color": (0, 255, 192)
+  },
+  "farm": {
+    "cost": 50,
+    "targeting": NoTarget(0),
+    "effect": MoneyEffect(20, 10),
+    "color": (0, 255, 255)
   }
 }
 

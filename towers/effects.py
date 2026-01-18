@@ -31,3 +31,7 @@ class InstantDamageEffect(EffectStrategy):
   def apply(self, tower, enemies, state):
     for enemy in enemies:
       enemy.take_damage(self.damage)
+
+class MoneyEffect(EffectStrategy):
+  def apply(self, tower, enemies, state):
+    state.money += self.damage
