@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import math
 
 class TargetingStrategy(ABC):
-  def __init__(self, range_val):
+  def __init__(self, range_val=0):
     self.range = range_val
 
   @abstractmethod
@@ -16,12 +16,14 @@ class TargetingStrategy(ABC):
     for enemy in state.enemies:
       dx = enemy.rect.centerx - tower.rect.centerx
       dy = enemy.rect.centery - tower.rect.centery
-      dist_sq = dx**2 + dy**2
-
-      if dist_sq <= range_sq:
+      if dx**2 + dy**2 <= range_sq:
         in_range.append(enemy)
     
     return in_range
+  
+class NoTarget(TargetingStrategy):
+  def select(self, tower, state):
+    return [tower]
 
 class ClosestEnemy(TargetingStrategy):
   def select(self, tower, state):

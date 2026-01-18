@@ -2,7 +2,7 @@ import pygame
 from map import Map
 from sidebar import Sidebar
 from balloons import balloon_factory
-from towers import tower_factory
+from towers import tower_factory, list_towers
 
 class Game:
   def __init__(self, screen, clock, difficulty):
@@ -17,9 +17,11 @@ class Game:
     self.money = 100
     self.health = 100
     self.sidebar = Sidebar()
-    self.sidebar.set_buttons([("basic", 10), ("sniper", 15)])
+    self.sidebar.set_buttons(list_towers())
     self.selected_tower = None
 
+    self.enemies.add(balloon_factory("yellow", self.map.waypoints, self.difficulty))
+    self.enemies.add(balloon_factory("yellow", self.map.waypoints, self.difficulty))
     self.enemies.add(balloon_factory("yellow", self.map.waypoints, self.difficulty))
 
   def _get_events(self, event):

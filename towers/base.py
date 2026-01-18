@@ -11,7 +11,7 @@ class Tower(pygame.sprite.Sprite):
     self.targeting = targeting
     self.effect = effect
 
-    self.cooldown_timer = 0
+    self.cooldown_timer = self.effect.cooldown
 
   def draw_range(self, surface, color=(0, 200, 255)):
     attack_range = getattr(self.targeting, "range", 0)
