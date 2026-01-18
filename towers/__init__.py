@@ -1,27 +1,38 @@
 from .base import Tower
-from .targeting import ClosestEnemy, HighestHPEnemy
-from .effects import ProjectileEffect, InstantDamageEffect
-from .projectiles import Projectile
+from .targeting import *
+from .effects import *
+from .projectiles import *
 
-class BasicTower(Tower):
-  COST = 10
-
-  def __init__(self, x, y):
-    super().__init__(x, y, ClosestEnemy(100), ProjectileEffect(5, 1, Projectile))
-    self.image.fill((255, 0, 0))
-
-class SniperTower(Tower):
-  COST = 20
-
-  def __init__(self, x, y):
-    super().__init__(x, y, HighestHPEnemy(1000), InstantDamageEffect(10, 5))
-    self.image.fill((192, 128, 0))
-
-TOWERS = {
-  "basic": BasicTower,
-  "sniper": SniperTower
+TOWER_DATA = {
+  "basic": {
+    "cost": 10,
+    "targeting": ClosestEnemy(100),
+    "effect": ProjectileEffect(5, 1, Projectile),
+    "color": (255, 0, 0),
+  },
+  "sniper": {
+    "cost": 20,
+    "targeting": HighestHPEnemy(1000),
+    "effect": InstantDamageEffect(10, 5),
+    "color": (192, 128, 0),
+  },
+  "cannon": {
+    "cost": 15,
+    "targeting": ClosestEnemy(100),
+    "effect": ProjectileEffect(5, 1.5, AoEProjectile, radius=50),
+    "color": (0, 255, 192)
+  }
 }
 
+class ConfigTower(Tower):
+  def __init__(self, x, y, cfg):
+    super().__init__(x, y, cfg["targeting"], cfg["effect"])
+    self.COST = cfg["cost"]
+    self.image.fill(cfg["color"])
+
 def tower_factory(name, x, y):
-    tower = TOWERS.get(name.lower(), BasicTower)
-    return tower(x, y)
+  cfg = TOWER_DATA.get(name.lower(), TOWER_DATA["basic"])
+  return ConfigTower(x, y, cfg)
+
+def list_towers():
+  return [(name, cfg["cost"]) for name, cfg in TOWER_DATA.items()]

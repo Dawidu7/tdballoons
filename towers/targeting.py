@@ -16,9 +16,7 @@ class TargetingStrategy(ABC):
     for enemy in state.enemies:
       dx = enemy.rect.centerx - tower.rect.centerx
       dy = enemy.rect.centery - tower.rect.centery
-      dist_sq = dx**2 + dy**2
-
-      if dist_sq <= range_sq:
+      if dx**2 + dy**2 <= range_sq:
         in_range.append(enemy)
     
     return in_range
