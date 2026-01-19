@@ -21,14 +21,25 @@ class Game:
     self.sidebar.set_buttons(list_towers())
     self.selected_tower = None
 
+    try:
+        self.pop_sound = pygame.mixer.Sound("./assets/sounds/BalloonPop.mp3")
+        self.throw_sound = pygame.mixer.Sound("./assets/sounds/Throw.mp3")
+        self.farm_sound = pygame.mixer.Sound("./assets/sounds/FarmMoney.mp3")
+        self.wave_start_sound = pygame.mixer.Sound("./assets/sounds/WaveStart.mp3")
+    except Exception as e:
+        print(f"Błąd dźwięku: {e}")
+        self.pop_sound = self.throw_sound = self.farm_sound = self.wave_start_sound = None
+
     self.wave_manager = WaveManager(self)
 
   def _get_events(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 if self.sidebar.handle_wave_click(event.pos, self.wave_manager.is_active):
-                   self.wave_manager.start_next_wave()
-                   return
+                    if self.wave_start_sound:
+                      self.wave_start_sound.play()
+                    self.wave_manager.start_next_wave()
+                    return
 
                 selected = self.sidebar.handle_click(event.pos)
                 if selected:
@@ -43,6 +54,9 @@ class Game:
         self.enemies.update(dt)
         for enemy in self.enemies:
             if not enemy.is_alive:
+                if self.pop_sound:
+                  self.pop_sound.play()
+
                 if hasattr(enemy, 'child_type') and enemy.child_type:
                     new_enemy = balloon_factory(enemy.child_type, self.map.waypoints, self.difficulty, 
                                                 enemy.current_waypoint_index, pygame.Vector2(enemy.pos))
