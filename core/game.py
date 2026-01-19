@@ -28,7 +28,8 @@ class Game(GameState):
   def handle_event(self, event):
     match event.type:
       case pygame.MOUSEBUTTONDOWN if event.button == 1:
-        if self.sidebar.handle_event(event):
+        sidebar_handled, _ = self.sidebar.handle_event(event)
+        if sidebar_handled:
           return
         
         if self.selected_tower:
@@ -69,7 +70,7 @@ class Game(GameState):
 
     if self.selected_tower:
       pos = pygame.mouse.get_pos()
-      can_place = self._can_place_tower_at(pos)
+      can_place = self._can_place_tower_at(*pos)
       color = (0, 255, 0) if can_place else (255, 0, 0)
       rect = pygame.Rect(0, 0, 32, 32)
       rect.center = pos
@@ -78,8 +79,7 @@ class Game(GameState):
       preview.draw_range(self.screen)
       pygame.draw.rect(self.screen, color, rect)
 
-  def _can_place_tower_at(self, pos):
-    x, y = pos
+  def _can_place_tower_at(self, x, y):
     if not self.map.can_place_tower(x, y):
       return False
 
@@ -93,7 +93,7 @@ class Game(GameState):
     return True
 
   def _try_place_tower(self, pos):
-    if not self.map.can_place_tower(*pos):
+    if not self._can_place_tower_at(*pos):
       return
     
     tower = tower_factory(self.selected_tower, *pos)

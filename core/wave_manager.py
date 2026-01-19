@@ -17,7 +17,6 @@ class WaveManager:
     self.spawn_timer = 0
 
   def update(self, dt):
-    print(self.is_active)
     if not self.is_active:
       return
     

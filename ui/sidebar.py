@@ -37,20 +37,19 @@ class Sidebar:
 
   def handle_event(self, event):
     if event.type != pygame.MOUSEBUTTONDOWN or event.button != 1:
-      return False
+      return (False, None)
     
     if not self.rect.collidepoint(event.pos):
-      return False
+      return (False, None)
     
     if not self.game.wave_manager.is_active and self.start_wave_button.handle_event(event):
-      return True
+      return (True, "next_wave")
     
     for btn in self.tower_buttons:
-      if self.game.money >= btn.cost:
-        if btn.handle_event(event):
-          return True
+      if btn.handle_event(event):
+        return (True, btn.name)
       
-    return True
+    return (True, None)
 
   def draw(self, screen):
     pygame.draw.rect(screen, (40, 40, 40), self.rect)
@@ -58,10 +57,10 @@ class Sidebar:
     screen.blit(self.font.render(f"Money: {self.game.money}", True, (255, 255, 255)), (self.rect.x + 20, 60))
 
     if self.game.wave_manager.is_active:
-      self.start_wave_button.bg_color = (120, 120, 120)
-      self.start_wave_button.hover_color = (120, 120, 120)
+      self.start_wave_button.is_disabled = True
       self.start_wave_button.set_text("Wave Active")
     else:
+      self.start_wave_button.is_disabled = False
       self.start_wave_button.bg_color = (80, 120, 80)
       self.start_wave_button.hover_color = (100, 140, 100)
       self.start_wave_button.set_text(f"Start Wave {self.game.wave_manager.wave + 1}")
@@ -69,6 +68,7 @@ class Sidebar:
     self.start_wave_button.draw(screen)
 
     for btn in self.tower_buttons:
+      btn.is_disabled = self.game.money < btn.cost
       btn.draw(screen)
   
   def _select_tower(self, name):
