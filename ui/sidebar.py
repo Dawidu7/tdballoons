@@ -1,51 +1,75 @@
 import pygame
+from .button import Button
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, SIDEBAR_WIDTH
 
 class Sidebar:
-  def __init__(self):
+  def __init__(self, game, towers):
+    self.game = game
+    
     self.rect = pygame.Rect(SCREEN_WIDTH - SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, SCREEN_HEIGHT)
     self.font = pygame.font.SysFont("Arial", 24)
-    self.small = pygame.font.SysFont("Arial", 18)
-    self.buttons = []
-    self.selected = None
+    self.font_small = pygame.font.SysFont("Arial", 18)
 
-    self.start_wave_rect = pygame.Rect(self.rect.x + 20, 120, self.rect.width - 40, 50)
+    self.start_wave_button = Button(
+      text="Start Wave 1",
+      pos=(self.rect.x + self.rect.width // 2, 145),
+      font=self.font_small,
+      bg_color=(80, 120, 80),
+      hover_color=(100, 140, 100),
+      action=self.game.wave_manager.start_next_wave
+    )
 
-  def set_buttons(self, tower_defs):
-    self.buttons.clear()
-    x = self.rect.x + 20
-    y = 200
-    for name, cost in tower_defs:
-      btn = pygame.Rect(x, y, self.rect.width - 40, 50)
-      self.buttons.append((btn, name, cost))
-      y += 70
+    self.tower_buttons = []
+    start_y, spacing = 200, 80
+    for i, (name, cost) in enumerate(towers):
+      btn = Button(
+        text=f"{name.title()} ${cost}",
+        pos=(self.rect.centerx, start_y + i * spacing),
+        font=self.font_small,
+        bg_color=(80, 80, 80),
+        hover_color=(100, 100, 100),
+        action=lambda n=name: self._select_tower(n)
+      )
+      btn.cost = cost
+      btn.name = name
 
-  def draw(self, surface, hp, money, wave_active=False, wave_number=0):
-    pygame.draw.rect(surface, (40, 40, 40), self.rect)
-    surface.blit(self.font.render(f"HP: {hp}", True, (255, 255, 255)), (self.rect.x + 20, 20))
-    surface.blit(self.font.render(f"Money: {money}", True, (255, 255, 255)), (self.rect.x + 20, 60))
+      self.tower_buttons.append(btn)
 
-    btn_color = (120, 120, 120) if wave_active else (80, 120, 80)
-    pygame.draw.rect(surface, btn_color, self.start_wave_rect)
-    label = "Wave Active" if wave_active else f"Start Wave {wave_number + 1}"
-    surface.blit(self.small.render(label, True, (255, 255, 255)),
-                 (self.start_wave_rect.x + 10, self.start_wave_rect.y + 14))
-
-    for btn, name, cost in self.buttons:
-      color = (80, 120, 80) if self.selected == name else (80, 80, 80)
-      pygame.draw.rect(surface, color, btn)
-      surface.blit(self.small.render(f"{name.title()} (${cost})", True, (255, 255, 255)), (btn.x + 10, btn.y + 14))
-
-  def handle_click(self, pos):
-    if not self.rect.collidepoint(pos):
-      return None
-    for btn, name, _ in self.buttons:
-      if btn.collidepoint(pos):
-        self.selected = name
-        return name
-    return None
-
-  def handle_wave_click(self, pos, wave_active):
-    if wave_active:
+  def handle_event(self, event):
+    if event.type != pygame.MOUSEBUTTONDOWN or event.button != 1:
       return False
-    return self.start_wave_rect.collidepoint(pos)
+    
+    if not self.rect.collidepoint(event.pos):
+      return False
+    
+    if not self.game.wave_manager.is_active and self.start_wave_button.handle_event(event):
+      return True
+    
+    for btn in self.tower_buttons:
+      if self.game.money >= btn.cost:
+        if btn.handle_event(event):
+          return True
+      
+    return True
+
+  def draw(self, screen):
+    pygame.draw.rect(screen, (40, 40, 40), self.rect)
+    screen.blit(self.font.render(f"HP: {self.game.hp}", True, (255, 255, 255)), (self.rect.x + 20, 20))
+    screen.blit(self.font.render(f"Money: {self.game.money}", True, (255, 255, 255)), (self.rect.x + 20, 60))
+
+    if self.game.wave_manager.is_active:
+      self.start_wave_button.bg_color = (120, 120, 120)
+      self.start_wave_button.hover_color = (120, 120, 120)
+      self.start_wave_button.set_text = ("Wave Active")
+    else:
+      self.start_wave_button.bg_color = (80, 120, 80)
+      self.start_wave_button.hover_color = (100, 140, 100)
+      self.start_wave_button.set_text = (f"Start Wave {self.game.wave_manager.wave + 1}")
+
+    self.start_wave_button.draw(screen)
+
+    for btn in self.tower_buttons:
+      btn.draw(screen)
+  
+  def _select_tower(self, name):
+    self.game.selected_tower = name
