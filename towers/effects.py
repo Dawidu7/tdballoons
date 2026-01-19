@@ -34,4 +34,6 @@ class InstantDamageEffect(EffectStrategy):
 
 class MoneyEffect(EffectStrategy):
   def apply(self, tower, enemies, state):
+    if not state.wave_manager.is_active:
+      return
     state.money += self.damage

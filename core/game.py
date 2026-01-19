@@ -36,6 +36,9 @@ class Game(GameState):
       
   def update(self, dt):
       self.wave_manager.update(dt)
+      if not self.wave_manager.is_active:
+        return
+
       self.enemies.update(dt)
       self.towers.update(dt, self)
       self.projectiles.update(dt)

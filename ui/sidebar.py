@@ -60,11 +60,11 @@ class Sidebar:
     if self.game.wave_manager.is_active:
       self.start_wave_button.bg_color = (120, 120, 120)
       self.start_wave_button.hover_color = (120, 120, 120)
-      self.start_wave_button.set_text = ("Wave Active")
+      self.start_wave_button.set_text("Wave Active")
     else:
       self.start_wave_button.bg_color = (80, 120, 80)
       self.start_wave_button.hover_color = (100, 140, 100)
-      self.start_wave_button.set_text = (f"Start Wave {self.game.wave_manager.wave + 1}")
+      self.start_wave_button.set_text(f"Start Wave {self.game.wave_manager.wave + 1}")
 
     self.start_wave_button.draw(screen)
 
