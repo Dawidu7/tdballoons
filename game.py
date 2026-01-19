@@ -3,6 +3,7 @@ from map import Map
 from sidebar import Sidebar
 from balloons import balloon_factory
 from towers import tower_factory, list_towers
+from wave_manager import WaveManager
 
 class Game:
   def __init__(self, screen, clock, difficulty):
@@ -20,13 +21,15 @@ class Game:
     self.sidebar.set_buttons(list_towers())
     self.selected_tower = None
 
-    self.enemies.add(balloon_factory("yellow", self.map.waypoints, self.difficulty))
-    self.enemies.add(balloon_factory("yellow", self.map.waypoints, self.difficulty))
-    self.enemies.add(balloon_factory("yellow", self.map.waypoints, self.difficulty))
+    self.wave_manager = WaveManager(self)
 
   def _get_events(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
+                if self.sidebar.handle_wave_click(event.pos, self.wave_manager.is_active):
+                   self.wave_manager.start_next_wave()
+                   return
+
                 selected = self.sidebar.handle_click(event.pos)
                 if selected:
                     self.selected_tower = selected
@@ -35,6 +38,8 @@ class Game:
                     self._try_place_tower(event.pos)
 
   def _update(self, dt):
+        self.wave_manager.update(dt)
+
         self.enemies.update(dt)
         for enemy in self.enemies:
             if not enemy.is_alive:
@@ -59,10 +64,9 @@ class Game:
     self.enemies.draw(self.screen)
     self.towers.draw(self.screen)
     self.projectiles.draw(self.screen)
-    self.sidebar.draw(self.screen, self.health, self.money)
+    self.sidebar.draw(self.screen, self.health, self.money, self.wave_manager.is_active, self.wave_manager.wave)
 
     if self.selected_tower:
-       
        pos = pygame.mouse.get_pos()
        can_place = self._can_place_tower_at(pos)
        color = (0, 255, 0) if can_place else (255, 0, 0)
