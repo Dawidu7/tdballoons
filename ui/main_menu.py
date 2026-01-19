@@ -1,7 +1,7 @@
 import pygame
-from settings import WIDTH  
+from settings import WIDTH, MENU_BUTTON_COLOR, MENU_BUTTON_HOVER_COLOR
 from states import GameState
-from ui.button import Button
+from .button import Button
 
 class MainMenu(GameState):
   def __init__(self, manager):
@@ -18,7 +18,7 @@ class MainMenu(GameState):
         text="NEW GAME",
         pos=(WIDTH // 2, 300),
         font=self.btn_font,
-        bg_color=(0, 100, 0),
+        bg_color=MENU_BUTTON_COLOR,
         hover_color=(0, 180, 0),
         action=self.manager.go_to_difficulty
       ),
@@ -26,8 +26,8 @@ class MainMenu(GameState):
         text="QUIT",
         pos=(WIDTH // 2, 450),
         font=self.btn_font,
-        bg_color=(0, 100, 0),
-        hover_color=(0, 180, 0),
+        bg_color=MENU_BUTTON_COLOR,
+        hover_color=MENU_BUTTON_HOVER_COLOR,
         action=self._quit_game
       ),
     ]

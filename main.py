@@ -1,6 +1,7 @@
 import pygame
 from core.game import Game
 from ui.main_menu import MainMenu
+from ui.difficulty_menu import DifficultyMenu
 from settings import WIDTH, HEIGHT, FPS
 
 class Manager:
@@ -17,10 +18,10 @@ class Manager:
         self.state = MainMenu(self)
 
     def go_to_difficulty(self):
-        self.state = MainMenu(self)
+        self.state = DifficultyMenu(self)
 
-    def go_to_game(self):
-        self.state = Game(self.screen, self.clock, "Normal")
+    def go_to_game(self, difficulty):
+        self.state = Game(self.screen, self.clock, difficulty)
 
     def run(self):
         while self.is_running:
