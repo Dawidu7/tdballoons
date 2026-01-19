@@ -1,7 +1,7 @@
 import pygame
+from core.game import Game
+from ui.main_menu import MainMenu
 from settings import WIDTH, HEIGHT, FPS
-from menu import Menu
-from game import Game
 
 class Manager:
     def __init__(self):
@@ -9,38 +9,32 @@ class Manager:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("TD Balloons")
         self.clock = pygame.time.Clock()
-        self.running = True
+        self.is_running = True
         
-        self.state = "MENU"
-        self.menu = Menu(self.screen)
-        self.game = None
+        self.go_to_menu()
+
+    def go_to_menu(self):
+        self.state = MainMenu(self)
+
+    def go_to_difficulty(self):
+        self.state = MainMenu(self)
+
+    def go_to_game(self):
+        self.state = Game(self.screen, self.clock, "Normal")
 
     def run(self):
-        while self.running:
+        while self.is_running:
             dt = self.clock.tick(FPS) / 1000.0
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.running = False
-                
-                if self.state == "MENU":
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        selected_diff = self.menu.handle_click(event.pos)
-                        if selected_diff:
-                            self.game = Game(self.screen, self.clock, selected_diff)
-                            self.state = "GAME"
-                
-                elif self.state == "GAME":
-                    if self.game:
-                        self.game._get_events(event)
+                    self.is_running = False
+                else:
+                    self.state.handle_event(event)
 
-            if self.state == "MENU":
-                self.menu.draw()
-            elif self.state == "GAME":
-                if self.game:
-                    self.game._update(dt)
-                    self.game._draw()
+            self.state.update(dt)
             
+            self.state.draw()
             pygame.display.flip()
 
         pygame.quit()

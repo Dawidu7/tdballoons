@@ -1,11 +1,12 @@
 import pygame
-from map import Map
-from sidebar import Sidebar
+from core.map import Map
+from ui.sidebar import Sidebar
 from balloons import balloon_factory
 from towers import tower_factory, list_towers
-from wave_manager import WaveManager
+from core.wave_manager import WaveManager
+from states import GameState
 
-class Game:
+class Game(GameState):
   def __init__(self, screen, clock, difficulty):
     self.screen = screen
     self.clock = clock
@@ -23,42 +24,42 @@ class Game:
 
     self.wave_manager = WaveManager(self)
 
-  def _get_events(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                if self.sidebar.handle_wave_click(event.pos, self.wave_manager.is_active):
-                   self.wave_manager.start_next_wave()
-                   return
+  def handle_event(self, event):
+      if event.type == pygame.MOUSEBUTTONDOWN:
+          if event.button == 1:
+              if self.sidebar.handle_wave_click(event.pos, self.wave_manager.is_active):
+                  self.wave_manager.start_next_wave()
+                  return
 
-                selected = self.sidebar.handle_click(event.pos)
-                if selected:
-                    self.selected_tower = selected
-                    return
-                if self.selected_tower:
-                    self._try_place_tower(event.pos)
+              selected = self.sidebar.handle_click(event.pos)
+              if selected:
+                  self.selected_tower = selected
+                  return
+              if self.selected_tower:
+                  self._try_place_tower(event.pos)
 
-  def _update(self, dt):
-        self.wave_manager.update(dt)
+  def update(self, dt):
+      self.wave_manager.update(dt)
 
-        self.enemies.update(dt)
-        for enemy in self.enemies:
-            if not enemy.is_alive:
-                if hasattr(enemy, 'child_type') and enemy.child_type:
-                    new_enemy = balloon_factory(enemy.child_type, self.map.waypoints, self.difficulty, 
-                                                enemy.current_waypoint_index, pygame.Vector2(enemy.pos))
-                    self.enemies.add(new_enemy)
-                
-                self.money += enemy.reward
-                enemy.kill()
-            
-            if enemy.has_escaped:
-                self.health -= enemy.damage
-                enemy.kill()
+      self.enemies.update(dt)
+      for enemy in self.enemies:
+          if not enemy.is_alive:
+              if hasattr(enemy, 'child_type') and enemy.child_type:
+                  new_enemy = balloon_factory(enemy.child_type, self.map.waypoints, self.difficulty, 
+                                              enemy.current_waypoint_index, pygame.Vector2(enemy.pos))
+                  self.enemies.add(new_enemy)
+              
+              self.money += enemy.reward
+              enemy.kill()
+          
+          if enemy.has_escaped:
+              self.health -= enemy.damage
+              enemy.kill()
 
-        self.towers.update(dt, self)
-        self.projectiles.update(dt)
+      self.towers.update(dt, self)
+      self.projectiles.update(dt)
 
-  def _draw(self):
+  def draw(self):
     self.screen.fill((0, 0, 0))
     self.map.draw(self.screen)
     self.enemies.draw(self.screen)

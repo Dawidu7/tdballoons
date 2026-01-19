@@ -1,6 +1,7 @@
 import pygame
+from states import GameState
 
-class Menu:
+class Menu(GameState):
     def __init__(self, screen):
         self.screen = screen
         self.font = pygame.font.SysFont("Arial", 64)
@@ -25,6 +26,13 @@ class Menu:
             rect = text.get_rect(center=(screen_rect.centerx, 350 + i * 100))
             self.level_buttons.append((text, rect, level))
 
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            pass
+
+    def update(self, dt):
+        pass
+
     def draw(self):
         self.screen.fill((30, 30, 30))
         mouse_pos = pygame.mouse.get_pos()
@@ -42,13 +50,13 @@ class Menu:
                     pygame.draw.rect(self.screen, (100, 100, 100), rect.inflate(20, 20))
                 self.screen.blit(text, rect)
 
-    def handle_click(self, pos):
+    def _handle_click(self, pos):
         if self.state == "MAIN":
             if self.start_rect.collidepoint(pos):
                 self.state = "DIFFICULTY"
                 return None
         elif self.state == "DIFFICULTY":
-            for text, rect, level in self.level_buttons:
+            for _, rect, level in self.level_buttons:
                 if rect.collidepoint(pos):
                     return level
         return None
