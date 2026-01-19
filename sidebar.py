@@ -9,6 +9,8 @@ class Sidebar:
     self.buttons = []
     self.selected = None
 
+    self.start_wave_rect = pygame.Rect(self.rect.x + 20, 120, self.rect.width - 40, 50)
+
   def set_buttons(self, tower_defs):
     self.buttons.clear()
     x = self.rect.x + 20
@@ -18,10 +20,16 @@ class Sidebar:
       self.buttons.append((btn, name, cost))
       y += 70
 
-  def draw(self, surface, hp, money):
+  def draw(self, surface, hp, money, wave_active=False, wave_number=0):
     pygame.draw.rect(surface, (40, 40, 40), self.rect)
     surface.blit(self.font.render(f"HP: {hp}", True, (255, 255, 255)), (self.rect.x + 20, 20))
     surface.blit(self.font.render(f"Money: {money}", True, (255, 255, 255)), (self.rect.x + 20, 60))
+
+    btn_color = (120, 120, 120) if wave_active else (80, 120, 80)
+    pygame.draw.rect(surface, btn_color, self.start_wave_rect)
+    label = "Wave Active" if wave_active else f"Start Wave {wave_number + 1}"
+    surface.blit(self.small.render(label, True, (255, 255, 255)),
+                 (self.start_wave_rect.x + 10, self.start_wave_rect.y + 14))
 
     for btn, name, cost in self.buttons:
       color = (80, 120, 80) if self.selected == name else (80, 80, 80)
@@ -36,3 +44,8 @@ class Sidebar:
         self.selected = name
         return name
     return None
+
+  def handle_wave_click(self, pos, wave_active):
+    if wave_active:
+      return False
+    return self.start_wave_rect.collidepoint(pos)
