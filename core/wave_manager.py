@@ -9,16 +9,22 @@ class WaveManager:
     self.spawn_timer = 0
 
   def start_next_wave(self):
+    if self.is_active:
+      return
     self.wave += 1
     self.is_active = True
     self.queue = ["red"] * (self.wave * 5)
+    self.spawn_timer = 0
 
   def update(self, dt):
     if not self.is_active:
       return
     
-    if not self.queue:
+    if not self.queue and len(self.game.enemies) == 0 and len(self.game.projectiles) == 0:
       self.is_active = False
+      return
+    
+    if not self.queue:
       return
     
     self.spawn_timer -= dt

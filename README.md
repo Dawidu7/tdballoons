@@ -2,15 +2,16 @@
 
 - [x] Base stats: `HP`, `speed`, `damage`, `reward`
 - [x] Movement logic
-- [ ] Split logic upon death
+- [x] Split logic upon death
 - [x] Factory method implementation
 
 ## Towers
 
-- [ ] Base stats: `damage`, `range`, `cooldown`, `cost`
-- [ ] Define the `attack()` method for override
+- [x] Base stats: `damage`, `range`, `cooldown`, `cost`
+- [x] Define the `attack()` method for override
 - [ ] Stat upgrades system
-- [ ] Create basic towers with different abilities
+- [x] Create basic towers with different abilities
+- [ ] Sell towers
 
 ## Maps
 
