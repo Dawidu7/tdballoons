@@ -9,7 +9,8 @@ class Map:
     self.waypoints = []
 
     self.straightness = straightness
-    self.rng = random.Random(seed)
+    self.seed = seed if seed is not None else random.randint(0, 999999)
+    self.rng = random.Random(self.seed)
 
     self._generate_path()
 

@@ -21,7 +21,7 @@ class DifficultyMenu(GameState):
         font=self.btn_font,
         bg_color=MENU_BUTTON_COLOR,
         hover_color=MENU_BUTTON_HOVER_COLOR,
-        action=lambda: self.manager.go_to_game(difficulty)
+        action=lambda: self.manager.go_to_game(difficulty=difficulty)
       ) for i, difficulty in enumerate(difficulties)
     ]
 

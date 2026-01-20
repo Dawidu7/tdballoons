@@ -31,14 +31,15 @@ TOWER_DATA = {
 }
 
 class ConfigTower(Tower):
-  def __init__(self, x, y, cfg):
+  def __init__(self, x, y, cfg, name):
     super().__init__(x, y, cfg["targeting"], cfg["effect"])
     self.COST = cfg["cost"]
     self.image.fill(cfg["color"])
+    self.name = name
 
 def tower_factory(name, x, y):
   cfg = TOWER_DATA.get(name.lower(), TOWER_DATA["basic"])
-  return ConfigTower(x, y, cfg)
+  return ConfigTower(x, y, cfg, name)
 
 def list_towers():
   return [(name, cfg["cost"]) for name, cfg in TOWER_DATA.items()]
