@@ -1,6 +1,6 @@
 import pygame
-import os
 from assets import Assets
+from settings import BALLOON_SIZE
 
 class Balloon(pygame.sprite.Sprite):
     def __init__(self, color_name, hp, speed, damage, reward, waypoints, current_waypoint, current_pos=None):
@@ -15,11 +15,11 @@ class Balloon(pygame.sprite.Sprite):
         self.child_type = None 
 
         key = f"balloons.{color_name}"
-        img = Assets.image(key, (40, 50))
+        img = Assets.image(key, BALLOON_SIZE)
         if img:
             self.image = img
         else:
-            self.image = pygame.Surface((30, 30))
+            self.image = pygame.Surface(BALLOON_SIZE)
             self.image.fill((255, 0, 255))
             
         self.rect = self.image.get_rect()
