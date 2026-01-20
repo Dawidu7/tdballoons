@@ -86,7 +86,7 @@ class Map:
     start = pygame.Vector2(self.waypoints[0])
     next = pygame.Vector2(self.waypoints[1])
     start_dir = (start - next).normalize()
-    self.waypoints.insert(0, tuple(start + start_dir * TILE_START))
+    self.waypoints.insert(0, tuple(start + start_dir * TILE_SIZE))
 
     end = pygame.Vector2(self.waypoints[-1])
     prev = pygame.Vector2(self.waypoints[-2])
