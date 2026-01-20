@@ -11,6 +11,7 @@ class WaveManager:
   def start_next_wave(self):
     if self.is_active:
       return
+    
     self.wave += 1
     self.is_active = True
     self.queue = ["red"] * (self.wave * 5)

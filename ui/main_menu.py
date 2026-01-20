@@ -1,4 +1,5 @@
 import pygame
+from core.save_manager import SaveManager
 from settings import WIDTH, MENU_BUTTON_COLOR, MENU_BUTTON_HOVER_COLOR
 from states import GameState
 from .button import Button
@@ -23,8 +24,16 @@ class MainMenu(GameState):
         action=self.manager.go_to_difficulty
       ),
       Button(
-        text="QUIT",
+        text="CONTINUE",
         pos=(WIDTH // 2, 450),
+        font=self.btn_font,
+        bg_color=MENU_BUTTON_COLOR,
+        hover_color=MENU_BUTTON_HOVER_COLOR,
+        action=self._load_game
+      ) if SaveManager.has_save() else None,
+      Button(
+        text="QUIT",
+        pos=(WIDTH // 2, 600 if SaveManager.has_save() else 450),
         font=self.btn_font,
         bg_color=MENU_BUTTON_COLOR,
         hover_color=MENU_BUTTON_HOVER_COLOR,
@@ -34,7 +43,8 @@ class MainMenu(GameState):
 
   def handle_event(self, event):
     for button in self.buttons:
-      button.handle_event(event)
+      if button:
+        button.handle_event(event)
 
   def update(self, dt):
     pass
@@ -45,7 +55,13 @@ class MainMenu(GameState):
     self.manager.screen.blit(self.title_text, self.title_rect)
 
     for button in self.buttons:
-      button.draw(self.manager.screen)
+      if button:
+        button.draw(self.manager.screen)
 
   def _quit_game(self):
     pygame.event.post(pygame.event.Event(pygame.QUIT))
+
+  def _load_game(self):
+    data = SaveManager.load_game()
+    if data:
+      self.manager.go_to_game(save_data=data)

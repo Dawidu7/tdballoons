@@ -20,8 +20,8 @@ class Manager:
     def go_to_difficulty(self):
         self.state = DifficultyMenu(self)
 
-    def go_to_game(self, difficulty):
-        self.state = Game(self, difficulty)
+    def go_to_game(self, difficulty=None, save_data=None):
+        self.state = Game(self, difficulty, save_data)
 
     def run(self):
         while self.is_running:

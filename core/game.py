@@ -1,32 +1,66 @@
 import pygame
 from balloons import balloon_factory
-from core.map import Map
-from core.wave_manager import WaveManager
 from towers import tower_factory, list_towers
 from states import GameState
 from ui.sidebar import Sidebar
+from .map import Map
+from .save_manager import SaveManager
+from .wave_manager import WaveManager
 
 class Game(GameState):
-  def __init__(self, manager, difficulty):
+  def __init__(self, manager, difficulty=None, save_data=None):
     self.manager = manager
     self.screen = manager.screen
-    self.difficulty = difficulty
 
-    self.map = Map(0.3)  # TODO: Modify straightness according to difficulty
+    if save_data:
+      self.difficulty = save_data["difficulty"]
+      self.money = save_data["money"]
+      self.hp = save_data["hp"]
+      map_seed = save_data["map_seed"]
+      straightness = save_data["map_straightness"]
+      start_wave = save_data["wave"]
+    else:
+      self.difficulty = difficulty or "normal"
+      self.money = 100
+      self.hp = 100
+      map_seed = None # Let map generate random seed
+      straightness = 0.3
+      start_wave = 0
 
-    self.money = 100
-    self.hp = 100
+    self.map = Map(straightness, map_seed)  # TODO: Modify straightness according to difficulty
+
     self.towers = pygame.sprite.Group()
     self.enemies = pygame.sprite.Group()
     self.projectiles = pygame.sprite.Group()
 
+    if save_data:
+      for t in save_data["towers"]:
+        tower = tower_factory(t["type"], t["x"], t["y"])
+        self.towers.add(tower)
+
     self.wave_manager = WaveManager(self)
+    self.wave_manager.wave = start_wave
 
     self.sidebar = Sidebar(self, list_towers())
     self.selected_tower = None
 
+    self.save_font = pygame.font.SysFont("Arial", 18)
+    self.save_message = ""
+    self.save_color = (255, 255, 255)
+    self.save_status_timer = 0
+
   def handle_event(self, event):
     match event.type:
+      case pygame.KEYDOWN if event.key == pygame.K_s:
+        if self.wave_manager.is_active:
+          self._show_message("Cannot save during wave!")
+          return
+        
+        if SaveManager.save_game(self):
+          self._show_message("Game saved!")
+        else:
+          self._show_message("Couldn't save game!")
+        
       case pygame.MOUSEBUTTONDOWN if event.button == 1:
         sidebar_handled, _ = self.sidebar.handle_event(event)
         if sidebar_handled:
@@ -36,10 +70,17 @@ class Game(GameState):
           self._try_place_tower(event.pos)
       
   def update(self, dt):
+      if self.save_status_timer > 0:
+        self.save_status_timer -= dt
+        if self.save_status_timer < 0:
+          self.save_status_timer = 0
+          self.save_message = ""
+
       self.wave_manager.update(dt)
+
       if not self.wave_manager.is_active:
         return
-
+      
       self.enemies.update(dt)
       self.towers.update(dt, self)
       self.projectiles.update(dt)
@@ -79,6 +120,19 @@ class Game(GameState):
       preview.draw_range(self.screen)
       pygame.draw.rect(self.screen, color, rect)
 
+    if self.save_message:
+      text = self.save_font.render(self.save_message, True, self.save_color)
+
+      bg_rect = text.get_rect(center=(self.screen.get_width() // 2, 50))
+      bg_rect.inflate_ip(20, 10)
+      
+      s = pygame.Surface((bg_rect.width, bg_rect.height))
+      s.set_alpha(200)
+      s.fill((0, 0, 0))
+      
+      self.screen.blit(s, bg_rect)
+      self.screen.blit(text, text.get_rect(center=bg_rect.center))
+
   def _can_place_tower_at(self, x, y):
     if not self.map.can_place_tower(x, y):
       return False
@@ -103,3 +157,8 @@ class Game(GameState):
     self.towers.add(tower)
     self.money -= tower.COST
     self.selected_tower = None
+
+  def _show_message(self, text, color=(192, 192, 192), duration=2.0):
+    self.save_message = text
+    self.save_color = color
+    self.save_status_timer = duration
