@@ -1,5 +1,6 @@
 import pygame
-import os
+from assets import Assets
+from settings import BALLOON_SIZE
 
 class Balloon(pygame.sprite.Sprite):
     def __init__(self, color_name, hp, speed, damage, reward, waypoints, current_waypoint, current_pos=None):
@@ -13,15 +14,12 @@ class Balloon(pygame.sprite.Sprite):
         self.current_waypoint_index = current_waypoint
         self.child_type = None 
 
-        formatted_color = color_name.capitalize()
-        image_path = os.path.join(os.path.dirname(__file__), "..", "assets", "images", "balloons", f"Balloon{formatted_color}.png")
-        image_path = os.path.normpath(image_path)
-
-        try:
-            raw_image = pygame.image.load(image_path).convert_alpha()
-            self.image = pygame.transform.scale(raw_image, (40, 50))
-        except pygame.error:
-            self.image = pygame.Surface((30, 30))
+        key = f"balloons.{color_name}"
+        img = Assets.image(key, BALLOON_SIZE)
+        if img:
+            self.image = img
+        else:
+            self.image = pygame.Surface(BALLOON_SIZE)
             self.image.fill((255, 0, 255))
             
         self.rect = self.image.get_rect()

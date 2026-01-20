@@ -1,6 +1,7 @@
-from settings import GRID_SIZE, TILE_SIZE, TILE_GRASS, TILE_PATH, TILE_START, TILE_END
-import random
 import pygame
+import random
+from assets import Assets
+from settings import GRID_SIZE, TILE_SIZE, TILE_GRASS, TILE_PATH, TILE_START, TILE_END
 
 class Map:
   def __init__(self, straightness, seed=None):
@@ -12,21 +13,18 @@ class Map:
 
     self._generate_path()
 
-  def draw(self, surface):
-    colors = {
-      TILE_GRASS: (34, 139, 34),
-      TILE_PATH: (200, 200, 200),
-      TILE_START: (0, 200, 255),
-      TILE_END: (255, 100, 0),
-    }
-
+  def draw(self, screen):
     for row in range(GRID_SIZE):
       for col in range(GRID_SIZE):
         tile = self.grid[row][col]
-        color = colors.get(tile, (0, 0, 0))
-        x = col * TILE_SIZE
-        y = row * TILE_SIZE
-        pygame.draw.rect(surface, color, (x, y, TILE_SIZE, TILE_SIZE))
+        pos = (col * TILE_SIZE, row * TILE_SIZE)
+
+        if tile == TILE_GRASS:
+          screen.blit(Assets.image("tiles.grass", (TILE_SIZE, TILE_SIZE)), pos)
+          continue
+
+        img = self._get_path_tile(row, col)
+        screen.blit(img, pos)
 
   def can_place_tower(self, x, y):
     col = x // TILE_SIZE
@@ -86,7 +84,7 @@ class Map:
     start = pygame.Vector2(self.waypoints[0])
     next = pygame.Vector2(self.waypoints[1])
     start_dir = (start - next).normalize()
-    self.waypoints.insert(0, tuple(start + start_dir * TILE_START))
+    self.waypoints.insert(0, tuple(start + start_dir * TILE_SIZE))
 
     end = pygame.Vector2(self.waypoints[-1])
     prev = pygame.Vector2(self.waypoints[-2])
@@ -169,3 +167,30 @@ class Map:
         return False
 
     return True
+  
+  def _is_path_tile(self, row, col):
+    if 0 <= row < GRID_SIZE and 0 <= col < GRID_SIZE:
+      return self.grid[row][col] in (TILE_PATH, TILE_START, TILE_END)
+    return False
+  
+  def _get_path_tile(self, row, col):
+    up = self._is_path_tile(row - 1, col)
+    down = self._is_path_tile(row + 1, col)
+    left = self._is_path_tile(row, col - 1)
+    right = self._is_path_tile(row, col + 1)
+
+    straight = Assets.image("tiles.straight", (TILE_SIZE, TILE_SIZE))
+    corner = Assets.image("tiles.corner", (TILE_SIZE, TILE_SIZE))
+
+    if (up and down) or (up and not left and not right) or (down and not left and not right):
+      return straight
+    
+    if (left and right) or (left and not up and not down) or (right and not up and not down):
+      return pygame.transform.rotate(straight, 90)
+    
+    if down and right: return corner
+    if up and right: return pygame.transform.rotate(corner, 90)
+    if up and left: return pygame.transform.rotate(corner, 180)
+    if down and left: return pygame.transform.rotate(corner, 270)
+
+    return straight
