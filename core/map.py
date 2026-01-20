@@ -26,6 +26,9 @@ class Map:
         img = self._get_path_tile(row, col)
         screen.blit(img, pos)
 
+        if tile in (TILE_START, TILE_END):
+          self._draw_arrow(screen, row, col, tile)
+
   def can_place_tower(self, x, y):
     col = x // TILE_SIZE
     row = y // TILE_SIZE
@@ -194,3 +197,33 @@ class Map:
     if down and left: return pygame.transform.rotate(corner, 270)
 
     return straight
+  
+  def _draw_arrow(self, screen, row, col, tile):
+    dirs = []
+    if self._is_path_tile(row - 1, col): dirs.append((0, -1))
+    if self._is_path_tile(row + 1, col): dirs.append((0, 1))
+    if self._is_path_tile(row, col - 1): dirs.append((-1, 0))
+    if self._is_path_tile(row, col + 1): dirs.append((1, 0))
+
+    if not dirs:
+      return
+    
+    dx, dy = dirs[0]
+    if tile == TILE_END:
+      dx, dy = -dx, -dy
+
+    arrow_len = TILE_SIZE // 6
+    arrow_width = TILE_SIZE // 8
+
+    cx = col * TILE_SIZE + TILE_SIZE // 2
+    cy = row * TILE_SIZE + TILE_SIZE // 2
+
+    tip = (cx + dx * arrow_len, cy + dy * arrow_len)
+
+    base_cx = cx - dx * arrow_len
+    base_cy = cy - dy * arrow_len
+
+    left = (base_cx - dy * arrow_width, base_cy + dx * arrow_width)
+    right = (base_cx + dy * arrow_width, base_cy - dx * arrow_width)
+
+    pygame.draw.polygon(screen, (255, 0, 0), [tip, left, right])
