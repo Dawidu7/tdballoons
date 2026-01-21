@@ -11,7 +11,6 @@ class SaveManager:
       "hp": game.hp,
       "wave": game.wave_manager.wave,
       "map_seed": game.map.seed, 
-      "map_straightness": game.map.straightness,
       "towers": []
     }
 

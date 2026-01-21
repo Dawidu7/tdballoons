@@ -104,7 +104,7 @@ class Game(GameState):
           self.money += enemy.reward
 
           if hasattr(enemy, 'child_type') and enemy.child_type:
-            new_enemy = balloon_factory(enemy.child_type, self.map.waypoints, self.difficulty, 
+            new_enemy = balloon_factory(enemy.child_type, self.map.waypoints, 
                                         enemy.current_waypoint_index, pygame.Vector2(enemy.pos))
             self.enemies.add(new_enemy)
           
@@ -147,6 +147,10 @@ class Game(GameState):
       
       self.screen.blit(s, bg_rect)
       self.screen.blit(text, text.get_rect(center=bg_rect.center))
+
+  def add_balloon(self, name):
+    balloon = balloon_factory(name, self.map.waypoints)
+    self.enemies.add(balloon)
 
   def _can_place_tower_at(self, x, y):
     if not self.map.can_place_tower(x, y):
