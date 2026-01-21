@@ -1,9 +1,11 @@
 import pygame
-from balloons import balloon_factory
-from towers import tower_factory, list_towers
-from states import GameState
-from ui.sidebar import Sidebar
+import random
 from assets import Assets
+from balloons import balloon_factory
+from settings import DIFFICULTIES
+from states import GameState
+from towers import tower_factory, list_towers
+from ui.sidebar import Sidebar
 from .map import Map
 from .save_manager import SaveManager
 from .wave_manager import WaveManager
@@ -12,23 +14,22 @@ class Game(GameState):
   def __init__(self, manager, difficulty=None, save_data=None):
     self.manager = manager
     self.screen = manager.screen
+
+    self.diff_key = save_data["difficulty"] if save_data else (difficulty or "normal")
+    self.diff_cfg = DIFFICULTIES.get(self.diff_key, DIFFICULTIES["normal"])
     
     if save_data:
-      self.difficulty = save_data["difficulty"]
       self.money = save_data["money"]
       self.hp = save_data["hp"]
       map_seed = save_data["map_seed"]
-      straightness = save_data["map_straightness"]
       start_wave = save_data["wave"]
     else:
-      self.difficulty = difficulty or "normal"
-      self.money = 100
-      self.hp = 100
-      map_seed = None # Let map generate random seed
-      straightness = 0.3
+      self.money = self.diff_cfg["start_money"]
+      self.hp = self.diff_cfg["start_hp"]
+      map_seed = None
       start_wave = 0
 
-    self.map = Map(straightness, map_seed)  # TODO: Modify straightness according to difficulty
+    self.map = Map(self.diff_cfg["map_straightness"], map_seed)
 
     self.towers = pygame.sprite.Group()
     self.enemies = pygame.sprite.Group()
@@ -53,13 +54,17 @@ class Game(GameState):
 
   def handle_event(self, event):
     match event.type:
-      case pygame.KEYDOWN if event.key == pygame.K_s:
+      case pygame.KEYDOWN if event.key == pygame.K_ESCAPE:
+        if self.selected_tower:
+          self.selected_tower = None
+          return
+        
         if self.wave_manager.is_active:
           self._show_message("Cannot save during wave!")
           return
         
         if SaveManager.save_game(self):
-          self._show_message("Game saved!")
+          self.manager.go_to_menu()
         else:
           self._show_message("Couldn't save game!")
         
@@ -100,13 +105,24 @@ class Game(GameState):
           continue
 
         if not enemy.is_alive:
-          pop_sound = Assets.sound("balloonpop")
           self.money += enemy.reward
+          pop_sound = Assets.sound("balloonpop")
+          pop_sound.play()
 
           if hasattr(enemy, 'child_type') and enemy.child_type:
-            new_enemy = balloon_factory(enemy.child_type, self.map.waypoints, self.difficulty, 
-                                        enemy.current_waypoint_index, pygame.Vector2(enemy.pos))
-            self.enemies.add(new_enemy)
+            base = getattr(enemy, "child_count", 0)
+            mult = self.diff_cfg.get("child_spawn_mult", 1.0)
+            count = max(1, int(round(base * mult)))
+
+            for _ in range(count):
+              jitter = pygame.Vector2(random.uniform(-8, 8), random.uniform(-8, 8))
+              new_enemy = balloon_factory(
+                enemy.child_type, 
+                self.map.waypoints, 
+                enemy.current_waypoint_index, 
+                pygame.Vector2(enemy.pos) + jitter
+              )
+              self.enemies.add(new_enemy)
           
           enemy.kill()
           
@@ -122,12 +138,18 @@ class Game(GameState):
       pos = pygame.mouse.get_pos()
       can_place = self._can_place_tower_at(*pos)
       color = (0, 255, 0) if can_place else (255, 0, 0)
-      rect = pygame.Rect(0, 0, 32, 32)
-      rect.center = pos
 
       preview = tower_factory(self.selected_tower, *pos)
       preview.draw_range(self.screen)
-      pygame.draw.rect(self.screen, color, rect)
+
+      preview_image = preview.image.copy()
+      preview_image.set_alpha(180)
+      tint = pygame.Surface(preview_image.get_size(), pygame.SRCALPHA)
+      tint.fill((*color, 120))
+      preview_image.blit(tint, (0, 0), special_flags=pygame.BLEND_RGB_ADD)
+
+      rect = preview_image.get_rect(center=pos)
+      self.screen.blit(preview_image, rect)
 
     if self.save_message:
       text = self.save_font.render(self.save_message, True, self.save_color)
@@ -142,12 +164,20 @@ class Game(GameState):
       self.screen.blit(s, bg_rect)
       self.screen.blit(text, text.get_rect(center=bg_rect.center))
 
+  def add_balloon(self, name):
+    balloon = balloon_factory(name, self.map.waypoints)
+    self.enemies.add(balloon)
+
   def _can_place_tower_at(self, x, y):
     if not self.map.can_place_tower(x, y):
       return False
 
-    preview_rect = pygame.Rect(0, 0, 32, 32)
-    preview_rect.center = (x, y)
+    if self.selected_tower:
+      preview = tower_factory(self.selected_tower, x, y)
+      preview_rect = preview.image.get_rect(center=(x, y))
+    else:
+      preview_rect = pygame.Rect(0, 0, 32, 32)
+      preview_rect.center = (x, y)
 
     for tower in self.towers:
       if tower.rect.colliderect(preview_rect):
@@ -160,11 +190,11 @@ class Game(GameState):
       return
     
     tower = tower_factory(self.selected_tower, *pos)
-    if self.money < tower.COST:
+    if self.money < tower.cost:
       return
     
     self.towers.add(tower)
-    self.money -= tower.COST
+    self.money -= tower.cost
     self.selected_tower = None
 
   def _show_message(self, text, color=(192, 192, 192), duration=2.0):

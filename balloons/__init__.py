@@ -1,58 +1,45 @@
+from dataclasses import dataclass
+from typing import Optional
 from .base import Balloon
 
+@dataclass(frozen=True)
+class BalloonConfig:
+    name: str
+    hp: int
+    speed: float
+    damage: int
+    reward: int
+    child_type: Optional[str] = None
+    child_count: int = 0
+
 BALLOON_DATA = {
-    "purple": {"hp": 10, "speed": 1.5, "damage": 5, "reward": 20},
-    "pink":   {"hp": 5,  "speed": 3.5, "damage": 2, "reward": 15},
-    "cyan":   {"hp": 4,  "speed": 3.0, "damage": 1, "reward": 12},
-    "yellow": {"hp": 3,  "speed": 2.5, "damage": 1, "reward": 10},
-    "orange": {"hp": 2,  "speed": 2.0, "damage": 1, "reward": 5},
-    "green":  {"hp": 2,  "speed": 1.8, "damage": 1, "reward": 4},
-    "red":    {"hp": 1,  "speed": 1.5, "damage": 1, "reward": 2}
+    "purple": BalloonConfig("purple", 10, 1.5, 5, 20, "pink", 2),
+    "pink":   BalloonConfig("pink", 5, 3.5, 2, 15, "cyan", 2),
+    "cyan":   BalloonConfig("cyan", 4, 3.0, 1, 12, "yellow", 2),
+    "yellow": BalloonConfig("yellow", 3, 2.5, 1, 10, "orange", 2),
+    "orange": BalloonConfig("orange", 2, 2.0, 1, 5, "green", 2),
+    "green":  BalloonConfig("green", 2, 1.8, 1, 4, "red", 2),
+    "red":    BalloonConfig("red", 1, 1.5, 1, 2),
 }
 
-CHILD_MAP = {
-    "purple": "pink",
-    "pink":   "cyan",
-    "cyan":   "yellow",
-    "yellow": "orange",
-    "orange": "green",
-    "green":  "red",
-    "red":    None
-}
-
-class ConcreteBalloon(Balloon):
-    def __init__(self, name, waypoints, hp_m, speed_m, reward_m, current_waypoint, current_pos):
-        data = BALLOON_DATA[name]
-        
-        final_hp = max(1, int(data["hp"] * hp_m))
-        final_speed = data["speed"] * speed_m
-        final_reward = int(data["reward"] * reward_m)
-
-        super().__init__(
-            color_name=name,
-            hp=final_hp,
-            speed=final_speed,
-            damage=data["damage"],
-            reward=final_reward,
-            waypoints=waypoints,
-            current_waypoint=current_waypoint,
-            current_pos=current_pos
-        )
-        self.child_type = CHILD_MAP.get(name)
-
-def balloon_factory(name, waypoints, difficulty="Normal", current_waypoint=0, current_pos=None):
+def balloon_factory(name, waypoints, current_waypoint=0, current_pos=None):
     name = name.lower()
     if name not in BALLOON_DATA:
         name = "red"
-    
-    diff_key = str(difficulty).strip().capitalize()
 
-    diff_settings = {
-        "Easy":   (0.7, 0.8, 1.3),
-        "Normal": (1.0, 1.0, 1.0),
-        "Hard":   (1.6, 1.4, 0.6)
-    }
+    cfg = BALLOON_DATA[name]
     
-    hp_m, speed_m, reward_m = diff_settings.get(diff_key, (1.0, 1.0, 1.0))
-    
-    return ConcreteBalloon(name, waypoints, hp_m, speed_m, reward_m, current_waypoint, current_pos)
+    balloon = Balloon(
+        color_name=name,
+        hp=cfg.hp,
+        speed=cfg.speed,
+        damage=cfg.damage,
+        reward=cfg.reward,
+        waypoints=waypoints,
+        current_waypoint=current_waypoint,
+        current_pos=current_pos
+    )
+    balloon.child_type = cfg.child_type
+    balloon.child_count = cfg.child_count
+
+    return balloon

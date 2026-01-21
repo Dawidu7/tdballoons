@@ -1,5 +1,5 @@
 import pygame
-from settings import WIDTH, MENU_BUTTON_COLOR, MENU_BUTTON_HOVER_COLOR
+from settings import WIDTH, MENU_BUTTON_COLOR, MENU_BUTTON_HOVER_COLOR, DIFFICULTIES
 from states import GameState
 from .button import Button
 
@@ -13,7 +13,6 @@ class DifficultyMenu(GameState):
     self.title_text = self.title_font.render("SELECT DIFFICULTY", True, (255, 255, 0))
     self.title_rect = self.title_text.get_rect(center=(WIDTH // 2, 200))
 
-    difficulties = ["easy", "normal", "hard"]
     self.buttons = [
       Button(
         text=difficulty.capitalize(),
@@ -21,8 +20,8 @@ class DifficultyMenu(GameState):
         font=self.btn_font,
         bg_color=MENU_BUTTON_COLOR,
         hover_color=MENU_BUTTON_HOVER_COLOR,
-        action=lambda: self.manager.go_to_game(difficulty=difficulty)
-      ) for i, difficulty in enumerate(difficulties)
+        action=lambda d=difficulty: self.manager.go_to_game(difficulty=d)
+      ) for i, difficulty in enumerate(DIFFICULTIES.keys())
     ]
 
   def handle_event(self, event):

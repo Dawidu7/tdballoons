@@ -19,7 +19,7 @@
 
 ## Difficulties
 
-- [ ] **Modifiers:**
+- [x] **Modifiers:**
   - Shorter path length
   - Faster balloons
   - Higher balloon `HP`
