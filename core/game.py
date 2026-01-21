@@ -24,11 +24,11 @@ class Game(GameState):
       self.difficulty = difficulty or "normal"
       self.money = 100
       self.hp = 100
-      map_seed = None # Let map generate random seed
+      map_seed = None
       straightness = 0.3
       start_wave = 0
 
-    self.map = Map(straightness, map_seed)  # TODO: Modify straightness according to difficulty
+    self.map = Map(straightness, map_seed)
 
     self.towers = pygame.sprite.Group()
     self.enemies = pygame.sprite.Group()
@@ -122,12 +122,18 @@ class Game(GameState):
       pos = pygame.mouse.get_pos()
       can_place = self._can_place_tower_at(*pos)
       color = (0, 255, 0) if can_place else (255, 0, 0)
-      rect = pygame.Rect(0, 0, 32, 32)
-      rect.center = pos
 
       preview = tower_factory(self.selected_tower, *pos)
       preview.draw_range(self.screen)
-      pygame.draw.rect(self.screen, color, rect)
+
+      preview_image = preview.image.copy()
+      preview_image.set_alpha(180)
+      tint = pygame.Surface(preview_image.get_size(), pygame.SRCALPHA)
+      tint.fill((*color, 120))
+      preview_image.blit(tint, (0, 0), special_flags=pygame.BLEND_RGB_ADD)
+
+      rect = preview_image.get_rect(center=pos)
+      self.screen.blit(preview_image, rect)
 
     if self.save_message:
       text = self.save_font.render(self.save_message, True, self.save_color)
@@ -146,8 +152,12 @@ class Game(GameState):
     if not self.map.can_place_tower(x, y):
       return False
 
-    preview_rect = pygame.Rect(0, 0, 32, 32)
-    preview_rect.center = (x, y)
+    if self.selected_tower:
+      preview = tower_factory(self.selected_tower, x, y)
+      preview_rect = preview.image.get_rect(center=(x, y))
+    else:
+      preview_rect = pygame.Rect(0, 0, 32, 32)
+      preview_rect.center = (x, y)
 
     for tower in self.towers:
       if tower.rect.colliderect(preview_rect):
