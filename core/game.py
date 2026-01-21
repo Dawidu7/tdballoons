@@ -1,9 +1,10 @@
 import pygame
-from balloons import balloon_factory
-from towers import tower_factory, list_towers
-from states import GameState
-from ui.sidebar import Sidebar
 from assets import Assets
+from balloons import balloon_factory
+from settings import DIFFICULTIES
+from states import GameState
+from towers import tower_factory, list_towers
+from ui.sidebar import Sidebar
 from .map import Map
 from .save_manager import SaveManager
 from .wave_manager import WaveManager
@@ -12,23 +13,22 @@ class Game(GameState):
   def __init__(self, manager, difficulty=None, save_data=None):
     self.manager = manager
     self.screen = manager.screen
+
+    self.diff_key = save_data["difficulty"] if save_data else (difficulty or "normal")
+    self.diff_cfg = DIFFICULTIES.get(self.diff_key, DIFFICULTIES["normal"])
     
     if save_data:
-      self.difficulty = save_data["difficulty"]
       self.money = save_data["money"]
       self.hp = save_data["hp"]
       map_seed = save_data["map_seed"]
-      straightness = save_data["map_straightness"]
       start_wave = save_data["wave"]
     else:
-      self.difficulty = difficulty or "normal"
-      self.money = 100
-      self.hp = 100
+      self.money = self.diff_cfg["start_money"]
+      self.hp = self.diff_cfg["start_hp"]
       map_seed = None
-      straightness = 0.3
       start_wave = 0
 
-    self.map = Map(straightness, map_seed)
+    self.map = Map(self.diff_cfg["map_straightness"], map_seed)
 
     self.towers = pygame.sprite.Group()
     self.enemies = pygame.sprite.Group()

@@ -51,7 +51,7 @@ TOWERS = {
 }
 
 def tower_factory(name, x, y):
-  cfg = TOWERS.get(name.lower(), "basic")
+  cfg = TOWERS.get(name.lower(), TOWERS["basic"])
 
   targeting = cfg.targeting()
   effect = cfg.effect()
