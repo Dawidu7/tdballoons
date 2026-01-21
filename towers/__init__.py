@@ -15,7 +15,7 @@ class TowerConfig:
   image_path: str
   sound_path: str
 
-TOWER_DATA = {
+TOWERS = {
   "basic": TowerConfig(
     name="basic",
     cost=10,
@@ -50,28 +50,8 @@ TOWER_DATA = {
   ),
 }
 
-class ConfigTower(Tower):
-  def __init__(self, x, y, cfg, name):
-    super().__init__(x, y, cfg["targeting"], cfg["effect"])
-    self.COST = cfg["cost"]
-    self.name = name
-
-    if hasattr(self.effect, 'sound_key'):
-        self.effect.sound_key = cfg.get("sound_path")
-
-    target_size = (80, 80)
-    asset_name = cfg.get("asset_path")
-    loaded_img = Assets.image(asset_name, size=target_size)
-    if loaded_img:
-        self.image = loaded_img
-    else:
-        self.image = pygame.Surface(target_size)
-        self.image.fill((192, 0, 0))
-    self.rect = self.image.get_rect(center=(x, y))
-    self.base_image = self.image
-
 def tower_factory(name, x, y):
-  cfg = TOWER_DATA.get(name.lower(), "basic")
+  cfg = TOWERS.get(name.lower(), "basic")
 
   targeting = cfg.targeting()
   effect = cfg.effect()
@@ -97,4 +77,4 @@ def tower_factory(name, x, y):
   return tower
 
 def list_towers():
-  return [(name, cfg.cost) for name, cfg in TOWER_DATA.items()]
+  return [(name, cfg.cost) for name, cfg in TOWERS.items()]
