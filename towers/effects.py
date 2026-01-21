@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from assets import Assets
 
 class EffectStrategy(ABC):
   def __init__(self, damage, cooldown):
@@ -16,8 +17,9 @@ class ProjectileEffect(EffectStrategy):
     self.projectile_kwargs = projectile_kwargs
 
   def apply(self, tower, enemies, state):
-    if hasattr(state, 'throw_sound') and state.throw_sound:
-        state.throw_sound.play()
+    throw_sound = Assets.sound("throw")
+    if throw_sound:
+        throw_sound.play()
     for enemy in enemies:
       bullet = self.projectile(
         start_pos=tower.rect.center,
@@ -36,6 +38,7 @@ class InstantDamageEffect(EffectStrategy):
 
 class MoneyEffect(EffectStrategy):
   def apply(self, tower, enemies, state):
-    if hasattr(state, 'farm_sound') and state.farm_sound:
-        state.farm_sound.play()
+    farm_sound = Assets.sound("farmmoney")
+    if farm_sound:
+        farm_sound.play()
     state.money += self.damage
