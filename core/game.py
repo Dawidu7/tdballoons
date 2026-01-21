@@ -170,11 +170,11 @@ class Game(GameState):
       return
     
     tower = tower_factory(self.selected_tower, *pos)
-    if self.money < tower.COST:
+    if self.money < tower.cost:
       return
     
     self.towers.add(tower)
-    self.money -= tower.COST
+    self.money -= tower.cost
     self.selected_tower = None
 
   def _show_message(self, text, color=(192, 192, 192), duration=2.0):

@@ -2,7 +2,7 @@ import pygame
 import math
 
 class Tower(pygame.sprite.Sprite):
-  def __init__(self, x, y, targeting, effect):
+  def __init__(self, targeting, effect):
     super().__init__()
 
     self.targeting = targeting
