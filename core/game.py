@@ -3,6 +3,7 @@ from balloons import balloon_factory
 from towers import tower_factory, list_towers
 from states import GameState
 from ui.sidebar import Sidebar
+from assets import Assets
 from .map import Map
 from .save_manager import SaveManager
 from .wave_manager import WaveManager
@@ -11,7 +12,7 @@ class Game(GameState):
   def __init__(self, manager, difficulty=None, save_data=None):
     self.manager = manager
     self.screen = manager.screen
-
+    
     if save_data:
       self.difficulty = save_data["difficulty"]
       self.money = save_data["money"]
@@ -40,6 +41,7 @@ class Game(GameState):
 
     self.wave_manager = WaveManager(self)
     self.wave_manager.wave = start_wave
+    self.was_wave_active = False
 
     self.sidebar = Sidebar(self, list_towers())
     self.selected_tower = None
@@ -77,6 +79,12 @@ class Game(GameState):
           self.save_message = ""
 
       self.wave_manager.update(dt)
+      if self.wave_manager.is_active and not self.was_wave_active:
+          start_sound = Assets.sound("wavestart")
+          if start_sound:
+              start_sound.play()
+      self.was_wave_active = self.wave_manager.is_active
+
 
       if not self.wave_manager.is_active:
         return
@@ -92,6 +100,7 @@ class Game(GameState):
           continue
 
         if not enemy.is_alive:
+          pop_sound = Assets.sound("balloonpop")
           self.money += enemy.reward
 
           if hasattr(enemy, 'child_type') and enemy.child_type:
