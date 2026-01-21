@@ -57,6 +57,7 @@ class ConfigTower(Tower):
         self.image = pygame.Surface(target_size)
         self.image.fill(cfg["color"])
     self.rect = self.image.get_rect(center=(x, y))
+    self.base_image = self.image
 
 def tower_factory(name, x, y):
   cfg = TOWER_DATA.get(name.lower(), TOWER_DATA["basic"])
