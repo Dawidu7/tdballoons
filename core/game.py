@@ -54,13 +54,17 @@ class Game(GameState):
 
   def handle_event(self, event):
     match event.type:
-      case pygame.KEYDOWN if event.key == pygame.K_s:
+      case pygame.KEYDOWN if event.key == pygame.K_ESCAPE:
+        if self.selected_tower:
+          self.selected_tower = None
+          return
+        
         if self.wave_manager.is_active:
           self._show_message("Cannot save during wave!")
           return
         
         if SaveManager.save_game(self):
-          self._show_message("Game saved!")
+          self.manager.go_to_menu()
         else:
           self._show_message("Couldn't save game!")
         
