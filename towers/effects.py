@@ -5,6 +5,13 @@ class EffectStrategy(ABC):
   def __init__(self, damage, cooldown):
     self.damage = damage
     self.cooldown = cooldown
+    self.sound_key = None
+
+  def play_tower_sound(self):
+    if self.sound_key:
+        snd = Assets.sound(self.sound_key)
+        if snd:
+            snd.play()
 
   @abstractmethod
   def apply(self, tower, targets, state):
@@ -17,9 +24,7 @@ class ProjectileEffect(EffectStrategy):
     self.projectile_kwargs = projectile_kwargs
 
   def apply(self, tower, enemies, state):
-    throw_sound = Assets.sound("throw")
-    if throw_sound:
-        throw_sound.play()
+    self.play_tower_sound()
     for enemy in enemies:
       bullet = self.projectile(
         start_pos=tower.rect.center,
@@ -33,12 +38,11 @@ class ProjectileEffect(EffectStrategy):
 
 class InstantDamageEffect(EffectStrategy):
   def apply(self, tower, enemies, state):
+    self.play_tower_sound()
     for enemy in enemies:
       enemy.take_damage(self.damage)
 
 class MoneyEffect(EffectStrategy):
   def apply(self, tower, enemies, state):
-    farm_sound = Assets.sound("farmmoney")
-    if farm_sound:
-        farm_sound.play()
+    self.play_tower_sound()
     state.money += self.damage
