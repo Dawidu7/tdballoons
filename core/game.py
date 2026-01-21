@@ -1,4 +1,5 @@
 import pygame
+import random
 from assets import Assets
 from balloons import balloon_factory
 from settings import DIFFICULTIES
@@ -100,13 +101,24 @@ class Game(GameState):
           continue
 
         if not enemy.is_alive:
-          pop_sound = Assets.sound("balloonpop")
           self.money += enemy.reward
+          pop_sound = Assets.sound("balloonpop")
+          pop_sound.play()
 
           if hasattr(enemy, 'child_type') and enemy.child_type:
-            new_enemy = balloon_factory(enemy.child_type, self.map.waypoints, 
-                                        enemy.current_waypoint_index, pygame.Vector2(enemy.pos))
-            self.enemies.add(new_enemy)
+            base = getattr(enemy, "child_count", 0)
+            mult = self.diff_cfg.get("child_spawn_mult", 1.0)
+            count = max(1, int(round(base * mult)))
+
+            for _ in range(count):
+              jitter = pygame.Vector2(random.uniform(-8, 8), random.uniform(-8, 8))
+              new_enemy = balloon_factory(
+                enemy.child_type, 
+                self.map.waypoints, 
+                enemy.current_waypoint_index, 
+                pygame.Vector2(enemy.pos) + jitter
+              )
+              self.enemies.add(new_enemy)
           
           enemy.kill()
           

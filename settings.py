@@ -32,7 +32,8 @@ DIFFICULTIES = {
     "enemy_speed_mult": 0.8,
     "reward_mult": 1.2,
     "wave_count_mult": 0.7,
-    "wave_interval_mult": 1.5
+    "wave_interval_mult": 1.5,
+    "child_spawn_mult": 0.8
   },
   "normal": {
     "start_money": 100,
@@ -42,7 +43,8 @@ DIFFICULTIES = {
     "enemy_speed_mult": 1.0,
     "reward_mult": 1.0,
     "wave_count_mult": 1.0,
-    "wave_interval_mult": 1.0
+    "wave_interval_mult": 1.0,
+    "child_spawn_mult": 1.0
   },
   "hard": {
     "start_money": 75,
@@ -52,6 +54,7 @@ DIFFICULTIES = {
     "enemy_speed_mult": 0.8,
     "reward_mult": 1.2,
     "wave_count_mult": 1.5,
-    "wave_interval_mult": 0.7
+    "wave_interval_mult": 0.7,
+    "child_spawn_mult": 1.5
   },
 }
